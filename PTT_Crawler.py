@@ -1,13 +1,14 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-
+from urllib.request import urlretrieve   #模組的檔案 request , class(工廠)方便使用資料型態 > 
+import ssl 
+ssl._create_default_https_context = ssl._create_unverified_context   #(備註：加了之後mac資料才跑出來）
 # url = 'https://www.ptt.cc/bbs/Grad-ProbAsk/index.html'
 url = "https://www.ptt.cc/bbs/Beauty/index.html"
-
 reg_imgur_file  = re.compile('http[s]?://[i.]*imgur.com/\w+\.(?:jpg|png|gif)')
 
-for round in range(2):
+for round in range(1):
     res = requests.get(url, headers={
         "cookie":"over18=1"
     })
@@ -31,4 +32,7 @@ for round in range(2):
     })  # 那篇文章所有HTML
         images = reg_imgur_file.findall(res.text)
         print(images)
-    
+        for image in set(images):   ## set 不會有重複的元素 >> list >> for loop
+            ID = re.search('http[s]?://[i.]*imgur.com/(\w+\.(?:jpg|png|gif))',image).group(1)  #\w+\.(? 亂碼
+            print(ID)
+            urlretrieve(image,ID)
