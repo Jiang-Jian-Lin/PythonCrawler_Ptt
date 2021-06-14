@@ -4,10 +4,13 @@ import re
 from urllib.request import urlretrieve   #模組的檔案 request , class(工廠)方便使用資料型態 > 
 import ssl 
 ssl._create_default_https_context = ssl._create_unverified_context   #(備註：加了之後mac資料才跑出來）
+import os
 
 def download_images(articles):
     for article in articles:
         print(article.text,article['href'])
+        if not os.path.isdir(os.path.join('download',article.text)):  ## General os.path.join ,  windows \ , Linux / 
+            os.mkdir(os.path.join('download',article.text))
         res = requests.get('https://www.ptt.cc'+article['href'], headers={ 
         #request.get請求也要加上cookie，不然一樣會被18禁的cookie擋住
         "cookie":"over18=1"
@@ -17,13 +20,13 @@ def download_images(articles):
         for image in set(images):   ## set 不會有重複的元素 >> list >> for loop
             ID = re.search('http[s]?://[i.]*imgur.com/(\w+\.(?:jpg|png|gif))',image).group(1)  #\w+\.(? 亂碼
             print(ID)
-            urlretrieve(image,ID)
+            urlretrieve(image, os.path.join('download',article.text,ID))   # (url, filename)  把'download',article.text, ID 接起來  #幾個參數就都接起來
 
 def crawler():
-    url = "https://www.ptt.cc/bbs/Beauty/index.html"
-    
-
-    for round in range(1):
+    if not os.path.isdir('download'):
+        os.mkdir('download')
+    url = "https://www.ptt.cc/bbs/Beauty/index.html"    
+    for round in range(3):
         res = requests.get(url, headers={
             "cookie":"over18=1"
         })
