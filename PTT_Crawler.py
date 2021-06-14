@@ -5,7 +5,7 @@ from urllib.request import urlretrieve   #模組的檔案 request , class(工廠
 import ssl 
 ssl._create_default_https_context = ssl._create_unverified_context   #(備註：加了之後mac資料才跑出來）
 import os
-
+import sys
 def download_images(articles):
     for article in articles:
         print(article.text,article['href'])
@@ -22,11 +22,13 @@ def download_images(articles):
             print(ID)
             urlretrieve(image, os.path.join('download',article.text,ID))   # (url, filename)  把'download',article.text, ID 接起來  #幾個參數就都接起來
 
-def crawler():
+def crawler(pages=3):
+    print(pages)
     if not os.path.isdir('download'):
         os.mkdir('download')
     url = "https://www.ptt.cc/bbs/Beauty/index.html"    
     for round in range(3):
+        
         res = requests.get(url, headers={
             "cookie":"over18=1"
         })
@@ -45,4 +47,6 @@ def crawler():
         download_images(articles)
         
 reg_imgur_file  = re.compile('http[s]?://[i.]*imgur.com/\w+\.(?:jpg|png|gif)')
-crawler()
+# print(sys.argv)  ##取得.py檔下的參數
+# print(int(sys.argv[1]))    ## string > int
+crawler(int(sys.argv[1]))
